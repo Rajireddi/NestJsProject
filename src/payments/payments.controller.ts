@@ -25,16 +25,16 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Create a new payment' })
   @ApiResponse({ status: 201, description: 'The payment has been successfully created.', type: Payment })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  create(@Body() createPaymentDto: CreatePaymentDto): Payment {
-    return this.paymentsService.create(createPaymentDto);
+  async create(@Body() createPaymentDto: CreatePaymentDto): Promise<Payment> {
+    return await this.paymentsService.create(createPaymentDto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all payments' })
   @ApiResponse({ status: 200, description: 'Return all payments.', type: [Payment] })
-  findAll(): Payment[] {
-    return this.paymentsService.findAll();
+  async findAll(): Promise<Payment[]> {
+    return await this.paymentsService.findAll();
   }
 
   @Get(':id')
@@ -43,8 +43,8 @@ export class PaymentsController {
   @ApiParam({ name: 'id', description: 'Payment id', type: Number })
   @ApiResponse({ status: 200, description: 'Return the payment.', type: Payment })
   @ApiResponse({ status: 404, description: 'Payment not found' })
-  findOne(@Param('id') id: string): Payment {
-    return this.paymentsService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<Payment> {
+    return await this.paymentsService.findOne(+id);
   }
 
   @Put(':id')
@@ -53,8 +53,8 @@ export class PaymentsController {
   @ApiParam({ name: 'id', description: 'Payment id', type: Number })
   @ApiResponse({ status: 200, description: 'The payment has been successfully updated.', type: Payment })
   @ApiResponse({ status: 404, description: 'Payment not found' })
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto): Payment {
-    return this.paymentsService.update(+id, updatePaymentDto);
+  async update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto): Promise<Payment> {
+    return await this.paymentsService.update(+id, updatePaymentDto);
   }
 
   @Delete(':id')
@@ -63,7 +63,7 @@ export class PaymentsController {
   @ApiParam({ name: 'id', description: 'Payment id', type: Number })
   @ApiResponse({ status: 204, description: 'The payment has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Payment not found' })
-  remove(@Param('id') id: string): void {
-    return this.paymentsService.remove(+id);
+  async remove(@Param('id') id: string): Promise<void> {
+    return await this.paymentsService.remove(+id);
   }
 }

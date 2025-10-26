@@ -1,60 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from './entities/payment.entity';
 
 @Injectable()
 export class PaymentsService {
-  private payments: Payment[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Payment)
+    private paymentsRepository: Repository<Payment>,
+  ) {}
 
-  create(createPaymentDto: CreatePaymentDto): Payment {
-    const newPayment = new Payment();
-    newPayment.id = this.idCounter++;
-    newPayment.amount = createPaymentDto.amount;
-    newPayment.currency = createPaymentDto.currency;
-    newPayment.description = createPaymentDto.description;
-    newPayment.status = createPaymentDto.status || 'pending';
-    newPayment.createdAt = new Date();
-    newPayment.updatedAt = new Date();
-    
-    this.payments.push(newPayment);
-    return newPayment;
+  async create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
+    const newPayment = this.paymentsRepository.create(createPaymentDto);
+    return await this.paymentsRepository.save(newPayment);
   }
 
-  findAll(): Payment[] {
-    return this.payments;
+  async findAll(): Promise<Payment[]> {
+    return await this.paymentsRepository.find();
   }
 
-  findOne(id: number): Payment {
-    const payment = this.payments.find(payment => payment.id === id);
+  async findOne(id: number): Promise<Payment> {
+    const payment = await this.paymentsRepository.findOne({ where: { id } });
     if (!payment) {
       throw new NotFoundException(`Payment with ID ${id} not found`);
     }
     return payment;
   }
 
-  update(id: number, updatePaymentDto: UpdatePaymentDto): Payment {
-    const paymentIndex = this.payments.findIndex(payment => payment.id === id);
-    if (paymentIndex === -1) {
-      throw new NotFoundException(`Payment with ID ${id} not found`);
-    }
-    
-    const updatedPayment = new Payment();
-    Object.assign(updatedPayment, this.payments[paymentIndex], updatePaymentDto, { 
-      updatedAt: new Date() 
-    });
-    
-    this.payments[paymentIndex] = updatedPayment;
-    return updatedPayment;
+  async update(id: number, updatePaymentDto: UpdatePaymentDto): Promise<Payment> {
+    const payment = await this.findOne(id);
+    Object.assign(payment, updatePaymentDto);
+    return await this.paymentsRepository.save(payment);
   }
 
-  remove(id: number): void {
-    const paymentIndex = this.payments.findIndex(payment => payment.id === id);
-    if (paymentIndex === -1) {
-      throw new NotFoundException(`Payment with ID ${id} not found`);
-    }
-    
-    this.payments.splice(paymentIndex, 1);
+  async remove(id: number): Promise<void> {
+    const payment = await this.findOne(id);
+    await this.paymentsRepository.remove(payment);
   }
 }
