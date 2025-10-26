@@ -8,11 +8,13 @@ import {
   Param,
   HttpStatus,
   HttpCode,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { Payment } from './entities/payment.entity';
 
 @ApiTags('payments')
@@ -27,6 +29,20 @@ export class PaymentsController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   async create(@Body() createPaymentDto: CreatePaymentDto): Promise<Payment> {
     return await this.paymentsService.create(createPaymentDto);
+  }
+
+  @Post(':id/process')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Process a payment with Stripe' })
+  @ApiParam({ name: 'id', description: 'Payment id', type: Number })
+  @ApiResponse({ status: 200, description: 'The payment has been successfully processed.', type: Payment })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 404, description: 'Payment not found' })
+  async processPayment(
+    @Param('id') id: string,
+    @Body() processPaymentDto: ProcessPaymentDto,
+  ): Promise<Payment> {
+    return await this.paymentsService.processPayment(+id, processPaymentDto.paymentMethodId);
   }
 
   @Get()
@@ -53,7 +69,10 @@ export class PaymentsController {
   @ApiParam({ name: 'id', description: 'Payment id', type: Number })
   @ApiResponse({ status: 200, description: 'The payment has been successfully updated.', type: Payment })
   @ApiResponse({ status: 404, description: 'Payment not found' })
-  async update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto): Promise<Payment> {
+  async update(
+    @Param('id') id: string,
+    @Body() updatePaymentDto: UpdatePaymentDto,
+  ): Promise<Payment> {
     return await this.paymentsService.update(+id, updatePaymentDto);
   }
 

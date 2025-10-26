@@ -23,12 +23,28 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository with Stripe payment integration.
 
 ## Project setup
 
 ```bash
 $ npm install
+```
+
+## Environment Configuration
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
+DB_NAME=your_db_name
+DB_SYNC=true
+DB_LOGGING=false
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 ```
 
 ## Compile and run the project
@@ -43,6 +59,27 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+## Stripe Integration
+
+This project includes Stripe payment integration with the following features:
+
+1. **Create Payment Intent**: Create a payment intent with Stripe
+2. **Process Payments**: Process payments using Stripe payment methods
+3. **Payment Status**: Check the status of payments
+
+### API Endpoints
+
+- `POST /payments` - Create a new payment
+- `POST /payments/:id/process` - Process a payment with Stripe
+- `GET /payments` - Get all payments
+- `GET /payments/:id` - Get a payment by ID
+- `PUT /payments/:id` - Update a payment
+- `DELETE /payments/:id` - Delete a payment
+
+### Frontend Integration
+
+A sample HTML file (`stripe-example.html`) is included to demonstrate how to integrate Stripe on the frontend.
 
 ## Run tests
 
@@ -96,4 +133,3 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-# NestJsProject
